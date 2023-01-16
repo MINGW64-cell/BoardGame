@@ -1,42 +1,35 @@
 package code;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Contents extends JPanel implements ActionListener	{
+public class Contents extends JPanel	{
  
-	private Image thing;
+	private Image imgBG;
 	
 	class spBool	{
 		
 		boolean bool;
-		private int tileNum;
+		int tileNum;
 		
 		spBool(boolean bool, int tileNum)	{
 			this.bool = bool;
-			
-			if(bool)	{
-				this.tileNum = tileNum;
-			}	else	{
-				this.tileNum = 0;
-			}
+			this.tileNum = tileNum;
 		}
 		
 	}	//end of 'spBool'
 	
 	int row = 25, col = 18, diceSum = 1;
+	ArrayList<Integer> pieces = new ArrayList<Integer>();
 	public spBool[][] grid = new spBool[row][col];	//60x60 px squares needed
 	
 	
@@ -44,29 +37,30 @@ public class Contents extends JPanel implements ActionListener	{
 
 		int fillerNum = 1;
 		boolean cat = false;
+		pieces.add(1000);
 		
 		for(int i = 0; i < grid.length; i++)	{
 			
-		double wthIsARiceTable = Math.sqrt(i+1);
-			
-		if(isInteger(wthIsARiceTable))	{
-			cat = !cat;
-		}
-			
-		if(isInteger(wthIsARiceTable))	{
-			
-			if(cat) {
-				for(int f = grid[i].length - 1; f >= 0; f--)
-					grid[i][f] = new spBool(true, fillerNum++);					
+			double wthIsARiceTable = Math.sqrt(i+1);
+				
+			if(isInteger(wthIsARiceTable))	{
+				cat = !cat;
+			}
+				
+			if(isInteger(wthIsARiceTable))	{
+				
+				if(cat) {
+					for(int f = grid[i].length - 1; f >= 0; f--)
+						grid[i][f] = new spBool(true, fillerNum++);					
+				}	else	{
+					for(int f = 0; f < grid[i].length; f++)
+						grid[i][f] = new spBool(true, fillerNum++);
+				}
+				
 			}	else	{
 				for(int f = 0; f < grid[i].length; f++)
-					grid[i][f] = new spBool(true, fillerNum++);
+					grid[i][f] = new spBool(false, 0);					
 			}
-			
-		}	else	{
-			for(int f = 0; f < grid[i].length; f++)
-				grid[i][f] = new spBool(false, 0);					
-		}
 		
 			if(!isInteger(wthIsARiceTable))	{
 				if(!cat)	{	//somehow always false
@@ -77,13 +71,17 @@ public class Contents extends JPanel implements ActionListener	{
 					grid[i][0].tileNum = fillerNum++;
 				}
 			}
-
+			
+//			if(grid[row - 1][col - 1].tileNum == 1);	{
+//				grid[row - 1][col - 1].tileNum = pieces.get(0);
+//			}
 			
 		}
 		
 		flipBoard();
-		super.setDoubleBuffered(true);
-		t = new Timer(7, this); //	int (frame/millisec)
+//		super.setDoubleBuffered(true);
+//		t = new Timer(7, this); //	int (frame/millisec)
+		
 	}
 	
 	void flipBoard()	{
@@ -104,53 +102,72 @@ public class Contents extends JPanel implements ActionListener	{
 		return true;
 	}
 
+	
 //Graphics
 	
 	public final Color path = new Color(115, 115, 115);
 	Color piece = new Color(255, 0, 0);
 	final int squareSize = 40;
 	boolean created = true;	//was false
+
+//	ImageIcon ii = new ImageIcon(this.getClass().getResource("USMap.jpg"));
 	
-	private int x = 956, y = 660;
+	private int x = row, y = col;
 	
     public void paintComponent(Graphics g) {
     	
     	super.paintComponent(g);	//refreshes the screen
     	
         Graphics2D g2d = (Graphics2D) g;
-        ArrayList<Graphics2D> polygons = new ArrayList<Graphics2D>();
-    	ImageIcon ii = new ImageIcon(this.getClass().getResource("My project.jpg"));
-        thing = ii.getImage();
-        g2d.drawImage(thing, x, y, this);
+//        ArrayList<Graphics2D> polygons = new ArrayList<Graphics2D>();
+//        imgBG = ii.getImage();
+//        g2d.drawImage(imgBG, row/2*40, col/2*40, this);
+        
+        int k = 0;
         
         for (int i = 0; i < row; i++) {
         	for(int j = 0; j < col; j++)	{
         		if(grid[i][j].bool)	{            	
                 g2d.fillOval(i * squareSize, j * squareSize, squareSize-10, squareSize-10);	//change x and y location values to fix        		
         		g2d.setColor(path);  
-        		polygons.add(g2d);
 //        		g2d.setText(grid[i][j].tileNum);
         		}
         	        		
         		if(grid[i][j].tileNum % 10 != 0)	{
         			g2d.setColor(new Color(0,0,0));
-        		}
+        		}	
+        		
         	}
         }
-        
-		g2d.fillRect(160, 100, 40, 215);
-		g2d.setColor(new Color(200, 200, 200));
+
+        //The Bus
+		g2d.setColor(new Color (215, 215, 215));
+		g2d.fillRect(160, 100, 60, 215);
+		g2d.setColor(Color.LIGHT_GRAY);
+		g2d.fillRect(170, 150, 5, 150);
+		g2d.fillRect(188, 150, 5, 150);
+		g2d.fillRect(205, 150, 5, 150);
+		g2d.setColor(Color.cyan);
+		int[] xpoints = {160, 220, 210, 170};
+		int[] ypoints = {130, 130, 100, 100};
+		g2d.fillPolygon(xpoints, ypoints, 4);
+		g2d.setColor(Color.black);
+		g2d.fillRect(150, 140, 10, 33);	//x and y based on top-left corner
+		g2d.fillRect(220, 140, 10, 33);
+		g2d.fillRect(150, 270, 10, 33);
+		g2d.fillRect(220, 270, 10, 33);
+		int[] xpointsWS = {160, 220, 210, 170};	//windshield
+		int[] ypointsWS = {130, 130, 140, 140};
+		g2d.fillPolygon(xpointsWS, ypointsWS, 4);
+
+		createSprite(x * 39, y * 39, g2d, Color.CYAN);
 		
 //		for(int i = 0; i < 4; i++) {	//Consider adding JTextField to ask for number of players
 //		}
 		
-		if(!created) {
-			createSprite(160, 260, g2d, Color.CYAN);	//cyan (956, 660)
-			createSprite(160, 110, g2d, new Color(0, 255, 0));	//green (y + 50)
-			createSprite(160, 160, g2d, new Color(0, 0, 255));	//red
-			createSprite(160, 210, g2d, new Color(255, 0, 0));	//blue
-			created = !created;
-		}
+//		createSprite(160, 110, g2d, new Color(0, 255, 0));	//green (y + 50)
+//		createSprite(160, 160, g2d, new Color(0, 0, 255));	//red
+//		createSprite(160, 210, g2d, new Color(255, 0, 0));	//blue
 			//init x and y: (row*40, col*40)
 		
 		
@@ -174,38 +191,21 @@ public class Contents extends JPanel implements ActionListener	{
     }
 
 //Mudada 
-         
-    private Timer t;
-    int x2;
-    int y2;
-    
-//    boolean open = false;    
-//	public void move(/* p1.getColor() */)	{	//override of methods (apparently)
-//    	//use diceSum
-//    	if(test.dieRolled)	{
-//	    	for(int i = 0 ; i < row; i++)	{
-//	    		for(int j = 0; j < col; j++)	{
-//	    			if(diceSum == grid[i][j].tileNum)	{
-//	    				test.dieRolled = false;
-//	    				open = false;
-////	    				createSprite(i * 40 - 64, j * 40 - 100, p1, Color.CYAN);	//replace 'Color c' with 'this'
-//	    				
-//	    			}
-//	    		}
-//	    	}
-//    	}    	
-//   }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		if(test.dieRolled) {
-			x = x2;
-			y = y2;
-			repaint();	//refreshes a frame
-			test.dieRolled = !test.dieRolled;
-		}
-	}
     
+	public void move(/* p1.getColor() */)	{	//override of methods (apparently)
+    	//use diceSum
+    	for(int i = 0 ; i < row; i++)	{
+    		for(int j = 0; j < col; j++)	{
+    			if(diceSum == grid[i][j].tileNum)	{
+    				x = i;
+    				y = j;
+    				repaint();
+    			}
+       		}
+    	}    	
+   }
+
+//ITW Features
     
 }
